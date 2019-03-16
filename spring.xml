@@ -1,0 +1,54 @@
+
+<!-- DynamicController is invoked by configuration sections that look like the below examples -->
+
+  <route name="relatedTopics" url="statistics/relatedTopics" controller="dynamicController" action="InvokeMethod">
+    <parameters>
+      <add key="methodname" value="ItemsFromDocuments" />
+      <add key="componentName" value="categoriesFromDocuments" />
+    </parameters>
+  </route>
+
+
+  <route name="relatedEntities" url="statistics/relatedEntities" controller="dynamicController" action="InvokeMethod">
+    <parameters>
+      <add key="methodname" value="ItemsFromDocuments" />
+      <add key="componentName" value="termsFromDocuments" />
+    </parameters>
+  </route>
+
+
+  <route name="documentCount" url="statistics/documentCount" controller="dynamicController" action="InvokeMethod">
+    <parameters>
+      <add key="methodname" value="Search"/>
+      <add key="componentName" value="externalRestCount"/>
+    </parameters>
+  </route>
+
+--------------------
+
+<!-- Here is an example config for one of the methods used above. -->
+
+  <object id="termsFromDocuments" type="Silobreaker.Api.Processors.ItemsFromDocumentsProcessor&lt;Elucidon.Core.ITerm>, Silobreaker.Api" singleton="false">
+    <constructor-arg name="queryExecutor" ref="queryExecutor" />
+    <constructor-arg name="itemsFromDocumentsQueryBuilder" ref="termsFromDocumentsQueryBuilder" />
+    <constructor-arg name="parameterResolver" ref="multiParameterResolver" />
+    <constructor-arg name="resultBuilder" ref="simpleTermListResultBuilder" />
+    <constructor-arg name="queryDecorator" ref="termPagingDecorator" />
+  </object>
+
+
+--------------------
+
+<!-- ... which in turn uses a parameter resolver that is configured as below --> 
+
+  <object id="multiParameterResolver" type="Silobreaker.Api.ParameterResolvers.MultiParameterResolver, Silobreaker.Api" >
+    <constructor-arg name="parameterResolvers">
+      <list element-type="Silobreaker.Api.Framework.IParameterResolver">
+        <ref object="httpParameterResolver"/>
+        <ref object="httpContextParameterResolver"/>
+      </list>
+    </constructor-arg>
+  </object>
+
+  <object id="httpParameterResolver" type="Silobreaker.Api.ParameterResolvers.HttpRequestParameterResolver, Silobreaker.Api" />
+  <object id="httpContextParameterResolver" type="Silobreaker.Api.ParameterResolvers.HttpContextParameterResolver, Silobreaker.Api" />
